@@ -1,217 +1,53 @@
-# Urban Airship PhoneGap/Cordova Plugin
+# Urban Airship PhoneGap/Cordova Plugin modified for AppGyver Steroids
 
 ### Platform Support
 
-This plugin supports PhoneGap/Cordova apps running on both iOS and Android.
+This plugin supports apps running on both iOS and Android.
 
 ### Version Requirements
 
-This plugin is meant to work with PhoneGap 3.0.0+ and the latest version of the Urban Airship library.
-More documentation and integration guides for IOS and Android are availble on our
-[website](https://docs.urbanairship.com/display/DOCS/Client%3A+PhoneGap). 
+This plugin is meant to work with AppGyver Steroids 3.1.0+.
 
-### Older PhoneGap versions
+### Differences to the original plugin
 
-A older version of the plugin for Phonegap 2.6 - 2.9 can be found [here](https://github.com/urbanairship/phonegap-ua-push/tree/1.0.8). 
+This plugin has been forked from the [official Urban Airship plugin](https://github.com/urbanairship/phonegap-ua-push).
 
-### Contributing Code
+Differences to the original include:
 
-We accept pull requests! If you would like to submit a pull request, please fill out and submit a
-Code Contribution Agreement (http://urbanairship.com/legal/contribution-agreement/).
+* takeOff() must be explicitly called by the application.
 
-## Migration
+* Plugin will be initialized only in those WebViews which have called takeOff(). The major difference is that Steroids has multiple WebViews where Cordova has only one.
 
-A migration guide for newer releases of the plugin can be found [here](MIGRATION.md).
+* Push notifications are not enabled by default. This will allow the application to define when the user will be asked whether he wants to allow push notifications. The dialog will be presented when enablePush() is called the first time.
 
-## Installation
 
-#### Automatic Installation using PhoneGap/Cordova CLI (iOS and Android)
-1. Install this plugin using PhoneGap/Cordova cli:
-```
-cordova plugin add https://github.com/urbanairship/phonegap-ua-push.git
-``` 
+### Installation
 
-2. Modify the www/config.xml directory to contain (replacing with your configuration settings):
+Please see the AppGyver guide for Push Notifications.
+
+1. Install this plugin to AppGyver build service and build a custom scanner.
+
+2. Modify the www/config.{ios,android}.xml file to contain (replacing with your configuration settings):
 
         <preference name="com.urbanairship.production_app_key" value="Your production app key" />
         <preference name="com.urbanairship.production_app_secret" value="Your production app secret" />
-        <preference name="com.urbanairship.development_app_key" value="Your development app key" />
-        <preference name="com.urbanairship.development_app_secret" value="Your development app secret" />
-        <preference name="com.urbanairship.in_production" value="If the app is in production or not" />
+        <preference name="com.urbanairship.in_production" value="true" />
         <preference name="com.urbanairship.gcm_sender" value="Android only: Your GCM sender id" />
 
-3. If your app supports Android API < 14, then you have to manually instrument any Android Activities to 
-have proper analytics.  
-See [Instrumenting Android Analytics](http://docs.urbanairship.com/build/android_features.html#setting-up-analytics-minor-assembly-required). 
+  Note: Your application will always be in production mode, since AppGyver Build Service will give an adhoc build or a custom scanner.
 
-#### iOS manual installation (unnecessary if installed automatically)
-1. Add src/ios/PushNotificationPlugin to your project
-1. Copy src/ios/Airship to your projects directory
-1. Add Airship as a Header search path (Project -> Build Settings -> Header Search Path)
-1. Add Airship/libUAirship-*.a as a library (Target -> Build Phases -> Link Binary With Libraries)
-1. Make sure the following frameworks are linked (Target -> Build Phases -> Link Binary With Libraries):
-
-
-        CFNetwork.framework
-        CoreGraphics.framework
-        Foundation.framework
-        MobileCoreServices.framework
-        Security.framework
-        SystemConfiguration.framework
-        UIKit.framework
-        libz.dylib
-        libsqlite3.dylib
-        CoreTelephony.framework
-        CoreLocation.framework
-        AudioToolbox.framework
-        StoreKit.framework
-
-1. Modify the cordova config.xml file to include the PushNotificationPlugin and preferences:
-
-
-        <feature name="PushNotificationPlugin">
-            <param name="ios-package" value="PushNotificationPlugin" />
-            <param name="onload" value="true" />
-        </feature>
-        
-        <preference name="com.urbanairship.production_app_key" value="Your production app key" />
-        <preference name="com.urbanairship.production_app_secret" value="Your production app secret" />
-        <preference name="com.urbanairship.development_app_key" value="Your development app key" />
-        <preference name="com.urbanairship.development_app_secret" value="Your development app secret" />
-        <preference name="com.urbanairship.in_production" value="If the app is in production or not" />
-
-1. Copy www/PushNotification.js into the project's www directory
-
-1. Require the PushNotification module `var PushNotification = require('<Path to PushNotification.js>')`
-
-#### Android manual installation (unnecessary if installed automatically)
-1. Copy src/Android/*.java files to your projects src/com/urbanairship/phonegap/ directory
-1. Copy src/Android/urbanairship-lib-*.jar to your projects libs directory
-
-1. Modify the AndroidManifest.xml to include these permissions:
-
-
-        <uses-permission android:name="android.permission.INTERNET" />
-        <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-        <uses-permission android:name="android.permission.VIBRATE" />
-        <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-        <uses-permission android:name="android.permission.WAKE_LOCK" />
-        <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-        <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    
-        <!-- MODIFICATION REQUIRED, replace $PACKAGE_NAME with your apps package name -->
-        <uses-permission android:name="$PACKAGE_NAME.permission.C2D_MESSAGE" />
-    
-        <!-- MODIFICATION REQUIRED, replace $PACKAGE_NAME with your apps package name -->
-        <permission android:name="$PACKAGE_NAME.permission.C2D_MESSAGE" android:protectionLevel="signature" />
-
-1. Modify the AndroidManifest.xml Application section to include:
-
-
-        <receiver android:name="com.urbanairship.phonegap.PushReceiver" />
-        <receiver android:name="com.urbanairship.CoreReceiver" />
-        <receiver android:name="com.urbanairship.push.GCMPushReceiver" android:permission="com.google.android.c2dm.permission.SEND">        
-            <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
-                <!-- MODIFICATION REQUIRED, replace $PACKAGE_NAME with your apps package name -->
-                <category android:name="$PACKAGE_NAME" /> 
-            </intent-filter>
-        </receiver>
-        
-        <meta-data android:name="com.urbanairship.autopilot" android:value="com.urbanairship.phonegap.PushAutopilot" /> 
-        
-        <service android:name="com.urbanairship.push.PushService" android:label="Push Notification Service"/>
-        <service android:name="com.urbanairship.push.PushWorkerService" android:label="Push Notification Worker Service"/>
-        <service android:name="com.urbanairship.analytics.EventService" android:label="Event Service"/>
-        
-        <provider android:name="com.urbanairship.UrbanAirshipProvider"
-            <!-- MODIFICATION REQUIRED, replace $PACKAGE_NAME with your apps package name -->
-            android:authorities="$PACKAGE_NAME.urbanairship.provider" 
-            android:exported="false"
-            android:multiprocess="true" />
-        
-        <service android:name="com.urbanairship.location.LocationService" android:label="Segments Service"/>
-
-
-1. Modify the cordova config.xml file to include the PushNotificationPlugin:
-
-
-        <feature name="PushNotificationPlugin">
-            <param name="android-package" value="com.urbanairship.phonegap.PushNotificationPlugin" />
-            <param name="onload" value="true" />
-        </feature>
-
-        <preference name="com.urbanairship.production_app_key" value="Your production app key" />
-        <preference name="com.urbanairship.production_app_secret" value="Your production app secret" />
-        <preference name="com.urbanairship.development_app_key" value="Your development app key" />
-        <preference name="com.urbanairship.development_app_secret" value="Your development app secret" />
-        <preference name="com.urbanairship.in_production" value="If the app is in production or not" />
-        <preference name="com.urbanairship.gcm_sender" value="Android only: Your GCM sender id" />
-
-1. If your app supports Android API < 14 (pre ICS), then need to manually instrument any Android Activities
-to get proper analytics.  
+3. If your app supports Android API < 14, then you have to manually instrument any Android Activities to
+have proper analytics.
 See [Instrumenting Android Analytics](http://docs.urbanairship.com/build/android_features.html#setting-up-analytics-minor-assembly-required).
 
-1. Copy www/PushNotification.js into the project's www directory
+### Usage:
 
-1. Require the PushNotification module `var PushNotification = require('<Path to PushNotification.js>')`
+A ```PushNotification``` object will be available in your application's global JavaScript namespace. See below for API documentation.
 
-## Example
-A full example can be found in Examples.  To run it, copy the files:
-- Examples/index.html to www/index.html
-- Examples/css/* to www/css
-- Examples/js/* to www/js
+Please follow the AppGyver Push Notification Guide (#TODO: Link here) for information how to create relevant certificates and configure the AppGyver Build Service.
 
-#### Basic Example
-    
-    // Callback for when a device has registered with Urban Airship.
-    // https://docs.urbanairship.com/display/DOCS/Server%3A+Android+Push+API#ServerAndroidPushAPI-Registration
-    PushNotification.registerEvent('registration', function (error, id) {
-        if (error) {
-            console.log('there was an error registering for push notifications');
-        } else {
-            console.log("Registered with ID: " + id);
-        } 
-    })
+A thing to remember: All certificates must be created for Apple's production push notification service! Developer certificates are only for Xcode. Since Build Service will provide you with an ad hoc build, you will need to set up everything as if you were running a production app. Likewise with Urban Airship: You need to configure your application to act in production mode.
 
-    // Register for any urban airship events
-    document.addEventListener("urbanairship.registration", function (event) {
-        if (event.error) {
-            console.log('there was an error registering for push notifications');
-        } else {
-            console.log("Registered with ID: " + event.pushID);
-        } 
-    }, false)
-
-    document.addEventListener("urbanairship.push", function (event) {
-        console.log("Incoming push: " + event.message)
-    }, false)
-
-    // Set tags on a device, that you can push to
-    // https://docs.urbanairship.com/display/DOCS/Server%3A+Tag+API
-    PushNotification.setTags(["loves_cats", "shops_for_games"], function () {
-        PushNotification.getTags(function (obj) {
-            obj.tags.forEach(function (tag) {
-                console.log("Tag: " + tag);
-            });
-        });
-    });
-
-    // Set an alias, this lets you tie a device to a user in your system
-    // https://docs.urbanairship.com/display/DOCS/Server%3A+iOS+Push+API#ServeriOSPushAPI-Alias
-    PushNotification.setAlias("awesomeuser22", function () {
-        push.getAlias(function (alias) {
-            console.log("The user formerly known as " + alias)
-        });
-    });
-
-    // Check if push is enabled
-    PushNotification.isPushEnabled(function (enabled) {
-        if (enabled) {
-            console.log("Push is enabled! Fire away!");
-        }
-    })
 
 ## Data objects
 
@@ -243,6 +79,11 @@ A push is an object that contains the data associated with a Push. The extras di
 **All methods without a return value return undefined**
 
 ### Top-level calls
+
+#### takeOff()
+
+Initialize plugin in the context of the calling WebView.
+This is different to Cordova, where the application only has one WebView.
 
 #### enablePush()
 
@@ -434,8 +275,8 @@ Report the location of the device.
 
 ### Events
 
-**Note:** If your application supports Android and it listens to any of the events, you should 
-start listening for events on both 'deviceReady' and 'resume' and stop listening for events on 'pause'.  
+**Note:** If your application supports Android and it listens to any of the events, you should
+start listening for events on both 'deviceReady' and 'resume' and stop listening for events on 'pause'.
 This will prevent the events from being handled in the background.
 
 ### Incoming Push
@@ -470,6 +311,6 @@ This event is triggered when your application receives a registration response f
             console.log('There was an error registering for push notifications.');
         } else {
             console.log("Registered with ID: " + event.pushID);
-        } 
+        }
     });
-    
+
