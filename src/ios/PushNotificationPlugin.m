@@ -18,8 +18,11 @@ typedef void (^UACordovaVoidCallbackBlock)(NSArray *args);
 
 - (void)pluginInitialize {
     UA_LINFO("Initializing PushNotificationPlugin");
+
+    UA_LINFO("Not enabling push notifications by default, to provide app with more control");
+    [UAPush setDefaultPushEnabledValue:NO];
+
     dispatchQueue =  dispatch_queue_create("com.urbanairship.push_plugin", DISPATCH_QUEUE_SERIAL);
-    [self takeOff];
 }
 
 - (void)takeOff {
@@ -225,6 +228,10 @@ typedef void (^UACordovaVoidCallbackBlock)(NSArray *args);
 }
 
 //registration
+
+- (void)takeOff:(CDVInvokedUrlCommand*) command {
+    [self takeOff];
+}
 
 - (void)registerForNotificationTypes:(CDVInvokedUrlCommand*)command {
     UA_LDEBUG(@"PushNotificationPlugin: register for notification types");
