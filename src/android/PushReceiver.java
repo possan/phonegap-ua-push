@@ -1,5 +1,10 @@
 package com.urbanairship.phonegap;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -8,19 +13,17 @@ import com.urbanairship.Logger;
 import com.urbanairship.UAirship;
 import com.urbanairship.push.PushManager;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public class PushReceiver extends BroadcastReceiver {
 
+    // @formatter:off
     private static final List<String> IGNORED_EXTRAS_KEYS = Arrays.asList(
-            "collapse_key",// c2dm collapse key
-            "from", // c2dm sender
-            PushManager.EXTRA_NOTIFICATION_ID, // int id of generated
-            PushManager.EXTRA_PUSH_ID, // internal UA push id
-            PushManager.EXTRA_ALERT); // ignore alert
+        "collapse_key", // c2dm collapse key
+        "from", // c2dm sender
+        PushManager.EXTRA_NOTIFICATION_ID, // int id of generated
+        PushManager.EXTRA_PUSH_ID, // internal UA push id
+        PushManager.EXTRA_ALERT // ignore alert
+    );
+    // @formatter:on
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -41,8 +44,7 @@ public class PushReceiver extends BroadcastReceiver {
         String alert = intent.getStringExtra(PushManager.EXTRA_ALERT);
         Map<String, String> extras = getNotificationExtras(intent);
 
-        Logger.info("Received push notification. Alert: " + alert +
-                ". Payload: " + extras + ". NotificationID=" + id);
+        Logger.info("Received push notification. Alert: " + alert + ". Payload: " + extras + ". NotificationID=" + id);
 
         PushNotificationPlugin.raisePush(alert, extras);
     }
@@ -51,8 +53,7 @@ public class PushReceiver extends BroadcastReceiver {
         String alert = intent.getStringExtra(PushManager.EXTRA_ALERT);
         Map<String, String> extras = getNotificationExtras(intent);
 
-        Logger.info("User clicked notification. Message: " + alert
-                + ". Payload: " + extras.toString());
+        Logger.info("User clicked notification. Message: " + alert + ". Payload: " + extras.toString());
 
         Intent launch = context.getPackageManager().getLaunchIntentForPackage(UAirship.getPackageName());
         launch.addCategory(Intent.CATEGORY_LAUNCHER);
@@ -68,14 +69,10 @@ public class PushReceiver extends BroadcastReceiver {
         String apid = intent.getStringExtra(PushManager.EXTRA_APID);
         Boolean valid = intent.getBooleanExtra(PushManager.EXTRA_REGISTRATION_VALID, false);
 
-        Logger.info("Registration complete. APID:"
-                + intent.getStringExtra(PushManager.EXTRA_APID)
-                + ". Valid: "
-                + intent.getBooleanExtra(PushManager.EXTRA_REGISTRATION_VALID, false));
+        Logger.info("Registration complete. APID:" + intent.getStringExtra(PushManager.EXTRA_APID) + ". Valid: " + intent.getBooleanExtra(PushManager.EXTRA_REGISTRATION_VALID, false));
 
         PushNotificationPlugin.raiseRegistration(valid, apid);
     }
-
 
     private Map<String, String> getNotificationExtras(Intent intent) {
         Map<String, String> extrasMap = new HashMap<String, String>();

@@ -49,7 +49,7 @@ PushNotification.prototype.registerForNotificationTypes = function (types, callb
 // Top level enabling/disabling
 
 PushNotification.prototype.takeOff = function (callback) {
-  this.call_native(callback, "takeOff")
+  this.call_native(callback, "takeOff");
 }
 
 PushNotification.prototype.enablePush = function (callback) {
