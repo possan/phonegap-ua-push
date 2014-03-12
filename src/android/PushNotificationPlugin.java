@@ -175,7 +175,7 @@ public class PushNotificationPlugin extends CordovaPlugin {
         options.developmentAppKey = configuredOptions.getString(DEVELOPMENT_KEY);
         options.developmentAppSecret = configuredOptions.getString(DEVELOPMENT_SECRET);
         options.gcmSender = configuredOptions.getString(GCM_SENDER);
-        options.inProduction = configuredOptions.getBoolean(IN_PRODUCTION);
+        options.inProduction = configuredOptions.getString(IN_PRODUCTION, "false").equals("true");
 
         // Always enable the use of the location service. This does not mean
         // that location is enabled. Still need to call enableLocation for that.
