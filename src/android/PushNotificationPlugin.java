@@ -74,6 +74,7 @@ public class PushNotificationPlugin extends CordovaPlugin {
     private ExecutorService executorService = Executors.newFixedThreadPool(1);
 
     public PushNotificationPlugin() {
+        Logger.logLevel = android.util.Log.DEBUG;
         Logger.info("PushNotificationPlugin constructor");
         // STEROIDSIFIED Do not register until takeOff
         instance = this;
@@ -181,6 +182,8 @@ public class PushNotificationPlugin extends CordovaPlugin {
         options.developmentAppSecret = configuredOptions.getString(DEVELOPMENT_SECRET);
         options.gcmSender = configuredOptions.getString(GCM_SENDER);
         options.inProduction = configuredOptions.getString(IN_PRODUCTION, "false").equals("true");
+        options.developmentLogLevel = android.util.Log.DEBUG;
+        options.productionLogLevel = android.util.Log.DEBUG;
         Logger.info("options.productionAppKey="+options.productionAppKey);
         Logger.info("options.productionAppSecret="+options.productionAppSecret);
         Logger.info("options.developmentAppKey="+options.developmentAppKey);
