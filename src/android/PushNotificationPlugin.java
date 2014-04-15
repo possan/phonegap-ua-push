@@ -68,9 +68,6 @@ public class PushNotificationPlugin extends CordovaPlugin {
     // Used to raise pushes and registration from the PushReceiver
     private static PushNotificationPlugin instance;
 
-    static {
-    }
-
     private PushPreferences pushPrefs;
     private LocationPreferences locationPrefs;
 
@@ -80,7 +77,6 @@ public class PushNotificationPlugin extends CordovaPlugin {
         Logger.logLevel = android.util.Log.DEBUG;
         Logger.info("PushNotificationPlugin constructor");
         // STEROIDSIFIED Do not register until takeOff
-        instance = this;
     }
 
     @Override
@@ -90,7 +86,6 @@ public class PushNotificationPlugin extends CordovaPlugin {
 
         // STEROIDSIFIED Do not takeOff automatically
         // Autopilot.automaticTakeOff(cordova.getActivity().getApplication());
-        instance = this;
     }
 
     private static JSONObject notificationObject(String message, Map<String, String> extras) {
@@ -173,6 +168,15 @@ public class PushNotificationPlugin extends CordovaPlugin {
     // STEROIDSIFIED brought back takeOff plugin method
     void takeOff(JSONArray data, CallbackContext callbackContext) {
         Logger.info("Takeoff called.");
+        Logger.info("old instance="+instance);
+        if (instance != null) {
+            Logger.info("Cancelling second takeoff.");
+            return;
+        }
+
+        Logger.info("setting instance="+instance);
+        instance = this;
+
         Application application = cordova.getActivity().getApplication();
 
         // Create the default options, will pull any config from the usual place - assets/airshipconfig.properties
@@ -194,7 +198,6 @@ public class PushNotificationPlugin extends CordovaPlugin {
         Logger.info("options.developmentAppSecret="+options.developmentAppSecret);
         Logger.info("options.gcmSender="+options.gcmSender);
         Logger.info("options.inProduction="+options.inProduction);
-        Logger.info("instance="+instance);
 
         // Always enable the use of the location service. This does not mean
         // that location is enabled. Still need to call enableLocation for that.
@@ -204,15 +207,21 @@ public class PushNotificationPlugin extends CordovaPlugin {
         options.minSdkVersion = 14;
 
         UAirship.takeOff(application, options);
+        instance = this;
+
+        Logger.info("setting intent receiver class");
         PushManager.shared().setIntentReceiver(PushReceiver.class);
 
         if (UAirship.shared().getAirshipConfigOptions().pushServiceEnabled) {
+            Logger.info("calling enablePush on start");
             PushManager.enablePush();
         }
 
+        Logger.info("get prefs");
         pushPrefs = PushManager.shared().getPreferences();
         locationPrefs = UALocationManager.shared().getPreferences();
 
+        Logger.info("calling success callback.");
         callbackContext.success();
     }
 
