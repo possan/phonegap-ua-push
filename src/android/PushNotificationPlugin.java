@@ -68,6 +68,9 @@ public class PushNotificationPlugin extends CordovaPlugin {
     // Used to raise pushes and registration from the PushReceiver
     private static PushNotificationPlugin instance;
 
+    static {
+    }
+
     private PushPreferences pushPrefs;
     private LocationPreferences locationPrefs;
 
@@ -87,6 +90,7 @@ public class PushNotificationPlugin extends CordovaPlugin {
 
         // STEROIDSIFIED Do not takeOff automatically
         // Autopilot.automaticTakeOff(cordova.getActivity().getApplication());
+        instance = this;
     }
 
     private static JSONObject notificationObject(String message, Map<String, String> extras) {
