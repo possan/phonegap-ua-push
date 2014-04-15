@@ -74,8 +74,9 @@ public class PushNotificationPlugin extends CordovaPlugin {
     private ExecutorService executorService = Executors.newFixedThreadPool(1);
 
     public PushNotificationPlugin() {
+        Logger.info("PushNotificationPlugin constructor");
         // STEROIDSIFIED Do not register until takeOff
-        // instance = this;
+        instance = this;
     }
 
     @Override
@@ -138,6 +139,9 @@ public class PushNotificationPlugin extends CordovaPlugin {
 
     @Override
     public boolean execute(final String action, final JSONArray data, final CallbackContext callbackContext) {
+        Logger.info("Execute: " + action);
+        Logger.info("data: " + data);
+
         if (!knownActions.contains(action)) {
             Logger.info("Invalid action: " + action);
             return false;
