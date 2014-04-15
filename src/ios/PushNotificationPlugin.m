@@ -17,6 +17,7 @@ typedef void (^UACordovaVoidCallbackBlock)(NSArray *args);
 @implementation PushNotificationPlugin
 
 - (void)pluginInitialize {
+    uaLogLevel = UALogLevelDebug;
     UA_LINFO("Initializing PushNotificationPlugin");
 
     UA_LINFO("Not enabling push notifications by default, to provide app with more control");
@@ -26,11 +27,16 @@ typedef void (^UACordovaVoidCallbackBlock)(NSArray *args);
 }
 
 - (void)takeOff {
+    UA_LINFO("In PushNotificationPlugin::takeOff");
+
     //Init Airship launch options
     UAConfig *config = [UAConfig defaultConfig];
     
     NSDictionary *settings = self.commandDelegate.settings;
 
+    config.logLevel = UALogLevelDebug;
+    config.developmentLogLevel = UALogLevelDebug;
+    config.productionLogLevel = UALogLevelDebug;
     config.productionAppKey = [settings valueForKey:@"com.urbanairship.production_app_key"] ?: config.productionAppKey;
     config.productionAppSecret = [settings valueForKey:@"com.urbanairship.production_app_secret"] ?: config.productionAppSecret;
     config.developmentAppKey = [settings valueForKey:@"com.urbanairship.development_app_key"] ?: config.developmentAppKey;
