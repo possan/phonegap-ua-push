@@ -80,8 +80,8 @@ public class PushNotificationPlugin extends CordovaPlugin {
 
     @Override
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
+        Logger.info("Initializing PushNotificationPlugin");
         super.initialize(cordova, webView);
-        Logger.debug("Initializing PushNotificationPlugin");
 
         // STEROIDSIFIED Do not takeOff automatically
         // Autopilot.automaticTakeOff(cordova.getActivity().getApplication());
@@ -139,7 +139,7 @@ public class PushNotificationPlugin extends CordovaPlugin {
     @Override
     public boolean execute(final String action, final JSONArray data, final CallbackContext callbackContext) {
         if (!knownActions.contains(action)) {
-            Logger.debug("Invalid action: " + action);
+            Logger.info("Invalid action: " + action);
             return false;
         }
 
@@ -147,7 +147,7 @@ public class PushNotificationPlugin extends CordovaPlugin {
             @Override
             public void run() {
                 try {
-                    Logger.debug("Plugin Execute: " + action);
+                    Logger.info("Plugin Execute: " + action);
                     Method method = PushNotificationPlugin.class.getDeclaredMethod(action, JSONArray.class, CallbackContext.class);
                     method.invoke(PushNotificationPlugin.this, data, callbackContext);
                 } catch (Exception e) {
@@ -163,6 +163,7 @@ public class PushNotificationPlugin extends CordovaPlugin {
 
     // STEROIDSIFIED brought back takeOff plugin method
     void takeOff(JSONArray data, CallbackContext callbackContext) {
+        Logger.info("Takeoff called.");
         Application application = cordova.getActivity().getApplication();
 
         // Create the default options, will pull any config from the usual place - assets/airshipconfig.properties
@@ -176,6 +177,13 @@ public class PushNotificationPlugin extends CordovaPlugin {
         options.developmentAppSecret = configuredOptions.getString(DEVELOPMENT_SECRET);
         options.gcmSender = configuredOptions.getString(GCM_SENDER);
         options.inProduction = configuredOptions.getString(IN_PRODUCTION, "false").equals("true");
+        Logger.info("options.productionAppKey="+options.productionAppKey);
+        Logger.info("options.productionAppSecret="+options.productionAppSecret);
+        Logger.info("options.developmentAppKey="+options.developmentAppKey);
+        Logger.info("options.developmentAppSecret="+options.developmentAppSecret);
+        Logger.info("options.gcmSender="+options.gcmSender);
+        Logger.info("options.inProduction="+options.inProduction);
+        Logger.info("instance="+instance);
 
         // Always enable the use of the location service. This does not mean
         // that location is enabled. Still need to call enableLocation for that.
@@ -332,7 +340,7 @@ public class PushNotificationPlugin extends CordovaPlugin {
             returnObject.put("endHour", endHour);
             returnObject.put("endMinute", endMinute);
 
-            Logger.debug("Returning quiet time");
+            Logger.info("Returning quiet time");
             callbackContext.success(returnObject);
         } catch (JSONException e) {
             callbackContext.error("Error building quietTime JSON");
@@ -349,7 +357,7 @@ public class PushNotificationPlugin extends CordovaPlugin {
             JSONObject returnObject = new JSONObject();
             returnObject.put("tags", new JSONArray(tags));
 
-            Logger.debug("Returning tags");
+            Logger.info("Returning tags");
             callbackContext.success(returnObject);
         } catch (JSONException e) {
             Logger.error("Error building tags JSON", e);
@@ -372,7 +380,7 @@ public class PushNotificationPlugin extends CordovaPlugin {
                 alias = null;
             }
 
-            Logger.debug("Settings alias: " + alias);
+            Logger.info("Settings alias: " + alias);
             PushManager.shared().setAlias(alias);
 
             callbackContext.success();
@@ -394,7 +402,7 @@ public class PushNotificationPlugin extends CordovaPlugin {
                 tagSet.add(tagsArray.getString(i));
             }
 
-            Logger.debug("Settings tags: " + tagSet);
+            Logger.info("Settings tags: " + tagSet);
             PushManager.shared().setTags(tagSet);
 
             callbackContext.success();
@@ -412,7 +420,7 @@ public class PushNotificationPlugin extends CordovaPlugin {
         try {
             boolean soundPreference = data.getBoolean(0);
             pushPrefs.setSoundEnabled(soundPreference);
-            Logger.debug("Settings Sound: " + soundPreference);
+            Logger.info("Settings Sound: " + soundPreference);
             callbackContext.success();
         } catch (JSONException e) {
             Logger.error("Error reading soundEnabled in callback", e);
@@ -428,7 +436,7 @@ public class PushNotificationPlugin extends CordovaPlugin {
         try {
             boolean vibrationPreference = data.getBoolean(0);
             pushPrefs.setVibrateEnabled(vibrationPreference);
-            Logger.debug("Settings Vibrate: " + vibrationPreference);
+            Logger.info("Settings Vibrate: " + vibrationPreference);
             callbackContext.success();
         } catch (JSONException e) {
             Logger.error("Error reading vibrateEnabled in callback", e);
@@ -444,7 +452,7 @@ public class PushNotificationPlugin extends CordovaPlugin {
         try {
             boolean quietPreference = data.getBoolean(0);
             pushPrefs.setQuietTimeEnabled(quietPreference);
-            Logger.debug("Settings QuietTime: " + quietPreference);
+            Logger.info("Settings QuietTime: " + quietPreference);
             callbackContext.success();
         } catch (JSONException e) {
             Logger.error("Error reading quietTimeEnabled in callback", e);
@@ -470,7 +478,7 @@ public class PushNotificationPlugin extends CordovaPlugin {
             end.set(Calendar.HOUR_OF_DAY, endHour);
             end.set(Calendar.MINUTE, endMinute);
 
-            Logger.debug("Settings QuietTime. Start: " + start.getTime() + ", End: " + end.getTime());
+            Logger.info("Settings QuietTime. Start: " + start.getTime() + ", End: " + end.getTime());
             pushPrefs.setQuietTimeInterval(start.getTime(), end.getTime());
             callbackContext.success();
         } catch (JSONException e) {
@@ -485,10 +493,10 @@ public class PushNotificationPlugin extends CordovaPlugin {
         }
 
         try {
-            Logger.debug("LOGGING LOCATION");
+            Logger.info("LOGGING LOCATION");
             UALocationManager.shared().recordCurrentLocation();
         } catch (ServiceNotBoundException e) {
-            Logger.debug("Location not bound, binding now");
+            Logger.info("Location not bound, binding now");
             UALocationManager.bindService();
         } catch (RemoteException e) {
             Logger.error("Caught RemoteException in recordCurrentLocation", e);
