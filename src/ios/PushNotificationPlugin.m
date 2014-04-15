@@ -34,7 +34,6 @@ typedef void (^UACordovaVoidCallbackBlock)(NSArray *args);
     
     NSDictionary *settings = self.commandDelegate.settings;
 
-    config.logLevel = UALogLevelDebug;
     config.developmentLogLevel = UALogLevelDebug;
     config.productionLogLevel = UALogLevelDebug;
     config.productionAppKey = [settings valueForKey:@"com.urbanairship.production_app_key"] ?: config.productionAppKey;
