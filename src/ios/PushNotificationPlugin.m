@@ -235,7 +235,10 @@ typedef void (^UACordovaVoidCallbackBlock)(NSArray *args);
 //registration
 
 - (void)takeOff:(CDVInvokedUrlCommand*) command {
-    [self takeOff];
+    [self performCallbackWithCommand:command expecting:nil withVoidBlock:^(NSArray *args) {
+        [self takeOff];
+        return [NSNull null];
+    }];
 }
 
 - (void)registerForNotificationTypes:(CDVInvokedUrlCommand*)command {
